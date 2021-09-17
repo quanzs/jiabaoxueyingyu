@@ -51,12 +51,15 @@
       .btn {
         display: inline-block;
         width: 40%;
+        height: 40px;
+        font-weight: bold;
+        font-size: 20px;
       }
       .invisible {
         visibility: hidden;
       }
       .flex-row {
-        margin-top: 50px;
+        margin-top: 30px;
         display: flex;
         align-items: center;
         width: 100%;
@@ -67,16 +70,19 @@
         display: flex;
         flex-wrap: wrap;
         margin-top: 20px;
-        padding: 0 20px;
+        padding: 0 10px;
+        justify-content: space-around;
       }
       .input-area span {
         display: inline-block;
         font-size: 20px;
-        padding: 10px 0;
         border: 1px solid pink;
         border-radius: 5px;
-        margin: 8px;
-        width: 30px;
+        margin: 12px 8px;
+        width: 46px;
+        height: 46px;
+        line-height: 46px;
+        border-radius: 50%;
         text-align: center;
       }
       .correct {
@@ -92,15 +98,20 @@
       <div class="item">
         <span class="word" id="hint">{{words[index].hint}}</span>
         <span class="word" id="word" :title="words[index].word"></span>
-        <a href="javascript:void(0);" @click="playSound" class="op-sound">
-          <span class="icon-sound"></span>
-        </a>
+        <div class="flex-row">
+          <button class="btn" @click="playSound" class="op-sound">跟读</button>
+        </div>
+        <audio
+          class="invisible"
+          id="sound"
+          :src="`s/${words[this.index].word}.mp3`"
+        ></audio>
       </div>
       <div class="input-area">
         <span v-for="w in splitedWords" onclick="tapInput()">{{w}}</span>
       </div>
       <div class="flex-row">
-        <button @click="redo">重来</button>
+        <button class="btn" @click="redo">重来</button>
       </div>
       <div class="flex-row">
         <button class="btn" @click="pre" v-if="index !== 0">前一个</button>
@@ -113,13 +124,11 @@
           下一个
         </button>
         <button v-else class="btn invisible">下一个</button>
-        <audio id="sound"></audio>
       </div>
     </div>
     ​
     <script>
       function tapInput() {
-        console.log(event);
         const el = event.target;
         if (el.classList.contains("invisible")) {
           return;
@@ -128,7 +137,6 @@
         const word = document.querySelector("#word");
         word.innerText += el.innerHTML;
         if (word.innerText === word.title) {
-          console.log("****good");
           word.classList.add("correct");
         } else if (
           word.innerText.length >= word.title.length &&
@@ -158,7 +166,7 @@
                 hint: "您好",
               },
               {
-                word: "wrold",
+                word: "world",
                 hint: "世界",
               },
               {
@@ -204,9 +212,7 @@
           playSound() {
             const sound = document.querySelector("#sound");
             sound.pause();
-            sound.src = `https://fanyi.baidu.com/gettts?lan=en&text=${
-              this.words[this.index].word
-            }&spd=3&source=web`;
+            sound.load();
             sound.play();
           },
         },
