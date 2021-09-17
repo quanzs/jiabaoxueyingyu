@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1"
+    />
+    <title>Document</title>
+    <script src="https://cdn.staticfile.org/vue/3.0.5/vue.global.js"></script>
+    <style>
+      [class^="icon-"],
+      [class*=" icon-"] {
+        display: inline-block;
+      }
+      .op-sound-active,
+      .op-sound-active:hover {
+        width: 31px;
+        height: 21px;
+        margin-right: 15px;
+        background-image: url(https://fanyi-cdn.cdn.bcebos.com/static/translation/img/translate/output/sound2x_d6f553d.gif);
+        background-image: url(https://fanyi-cdn.cdn.bcebos.com/static/translation/img/translate/output/sound1x_a31f763.gif)
+          \9;
+        -moz-background-size: 22px 21px;
+        -o-background-size: 22px 21px;
+        background-size: 22px 21px;
+        background-repeat: no-repeat;
+        background-position: 7px -2px;
+        padding: 0;
+      }
+      .icon-sound {
+        background-repeat: no-repeat;
+        background-image: url(https://fanyi-cdn.cdn.bcebos.com/static/translation/sprite/images/normal/index-sc413d90635_65ba9b0.png);
+        background-position: 0 -1046px;
+        height: 17px;
+        width: 19px;
+        transform: scale(1.5);
+        display: block;
+        margin: 0 auto;
+      }
+      .word {
+        margin-top: 30px;
+        display: block;
+        font-size: 50px;
+        height: 50px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .btn {
+        display: inline-block;
+        width: 40%;
+      }
+      .invisible {
+        visibility: hidden;
+      }
+      .flex-row {
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+      }
+      .input-area {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding: 0 20px;
+      }
+      .input-area span {
+        display: inline-block;
+        font-size: 20px;
+        padding: 10px 0;
+        border: 1px solid pink;
+        border-radius: 5px;
+        margin: 8px;
+        width: 30px;
+        text-align: center;
+      }
+      .correct {
+        color: green;
+      }
+      .wrong {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hello-vue" class="demo">
+      <div class="item">
+        <span class="word" id="hint">{{words[index].hint}}</span>
+        <span class="word" id="word" :title="words[index].word"></span>
+        <a href="javascript:void(0);" @click="playSound" class="op-sound">
+          <span class="icon-sound"></span>
+        </a>
+      </div>
+      <div class="input-area">
+        <span v-for="w in splitedWords" onclick="tapInput()">{{w}}</span>
+      </div>
+      <div class="flex-row">
+        <button @click="redo">重来</button>
+      </div>
+      <div class="flex-row">
+        <button class="btn" @click="pre" v-if="index !== 0">前一个</button>
+        <button v-else class="btn invisible">前一个</button>
+        <button
+          class="btn"
+          @click="next"
+          v-if="index !== (this.words.length - 1)"
+        >
+          下一个
+        </button>
+        <button v-else class="btn invisible">下一个</button>
+        <audio id="sound"></audio>
+      </div>
+    </div>
+    ​
+    <script>
+      function tapInput() {
+        console.log(event);
+        const el = event.target;
+        if (el.classList.contains("invisible")) {
+          return;
+        }
+        el.classList.add("invisible");
+        const word = document.querySelector("#word");
+        word.innerText += el.innerHTML;
+        if (word.innerText === word.title) {
+          console.log("****good");
+          word.classList.add("correct");
+        } else if (
+          word.innerText.length >= word.title.length &&
+          word.innerText !== word.title
+        ) {
+          word.classList.add("wrong");
+        }
+      }
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+          let rIndex = Math.floor(Math.random() * (i + 1));
+          // 打印交换值
+          // console.log(i, rIndex);
+          let temp = arr[rIndex];
+          arr[rIndex] = arr[i];
+          arr[i] = temp;
+        }
+        return arr;
+      }
+      const HelloVueApp = {
+        data() {
+          return {
+            index: 0,
+            words: [
+              {
+                word: "hello",
+                hint: "您好",
+              },
+              {
+                word: "wrold",
+                hint: "世界",
+              },
+              {
+                word: "yes",
+                hint: "是的",
+              },
+            ],
+          };
+        },
+        computed: {
+          // 计算属性的 getter
+          splitedWords: function () {
+            // `this` 指向 vm 实例
+            const arr = shuffle(this.words[this.index].word.split(""));
+            arr.push(String.fromCharCode(97 + Math.round(Math.random() * 25)));
+            arr.push(String.fromCharCode(97 + Math.round(Math.random() * 25)));
+            return arr;
+          },
+        },
+        methods: {
+          redo() {
+            document.querySelector("#word").innerText = "";
+            const spans = document.querySelectorAll(".input-area span");
+            for (const s of spans) {
+              s.classList.remove("invisible");
+            }
+            document.querySelector("#word").className = "word";
+          },
+          pre(event) {
+            if (this.index === 0) {
+              return;
+            }
+            this.index--;
+            this.redo();
+          },
+          next(event) {
+            if (this.index === this.words.length - 1) {
+              return;
+            }
+            this.index++;
+            this.redo();
+          },
+          playSound() {
+            const sound = document.querySelector("#sound");
+            sound.pause();
+            sound.src = `https://fanyi.baidu.com/gettts?lan=en&text=${
+              this.words[this.index].word
+            }&spd=3&source=web`;
+            sound.play();
+          },
+        },
+      };
+      Vue.createApp(HelloVueApp).mount("#hello-vue");
+    </script>
+  </body>
+</html>
