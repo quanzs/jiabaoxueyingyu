@@ -42,8 +42,8 @@
       .word {
         margin-top: 30px;
         display: block;
-        font-size: 50px;
-        height: 50px;
+        font-size: 56px;
+        height: 56px;
         font-weight: bold;
         text-align: center;
         margin-bottom: 30px;
@@ -75,7 +75,7 @@
       }
       .input-area span {
         display: inline-block;
-        font-size: 20px;
+        font-size: 26px;
         border: 1px solid pink;
         border-radius: 5px;
         margin: 12px 8px;
@@ -90,6 +90,19 @@
       }
       .wrong {
         color: red;
+      }
+      .report {
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        background: lightgreen;
+        left: 0;
+        top: 0;
+        padding: 30px;
+      }
+      .report .section {
+        font-size: 18px;
+        line-height: 36px;
       }
     </style>
   </head>
@@ -110,24 +123,41 @@
       <div class="input-area">
         <span v-for="w in splitedWords" onclick="tapInput()">{{w}}</span>
       </div>
-      <div class="flex-row">
+      <!-- <div class="flex-row">
         <button class="btn" @click="redo">重来</button>
-      </div>
+      </div> -->
       <div class="flex-row">
-        <button class="btn" @click="pre" v-if="index !== 0">前一个</button>
-        <button v-else class="btn invisible">前一个</button>
+        <!-- <button class="btn" @click="pre" v-if="index !== 0">前一个</button>
+        <button v-else class="btn invisible">前一个</button> -->
+        <button class="btn" @click="redo">重来</button>
         <button
-          class="btn"
+          class="btn next"
           @click="next"
           v-if="index !== (this.words.length - 1)"
         >
           下一个
         </button>
-        <button v-else class="btn invisible">下一个</button>
+        <button v-else @click="showReport" class="btn show-report">
+          查看成绩
+        </button>
+      </div>
+      <div class="report">
+        <h1>成绩单</h1>
+        <div class="section">
+          <span>正确: {{correctArr.length}}</span>
+        </div>
+        <div class="section">
+          <span>错误: {{errorArr.length}}</span>
+          <ul>
+            <li v-for="w in errorArr">{{w}}</li>
+          </ul>
+        </div>
       </div>
     </div>
     ​
     <script>
+      const correctArr = [];
+      const errorArr = [];
       function tapInput() {
         const el = event.target;
         if (el.classList.contains("invisible")) {
@@ -138,11 +168,13 @@
         word.innerText += el.innerHTML;
         if (word.innerText === word.title) {
           word.classList.add("correct");
+          document.querySelector(".btn.next").click();
         } else if (
           word.innerText.length >= word.title.length &&
           word.innerText !== word.title
         ) {
           word.classList.add("wrong");
+          document.querySelector(".btn.next").click();
         }
       }
       function shuffle(arr) {
@@ -159,19 +191,82 @@
       const HelloVueApp = {
         data() {
           return {
+            show: false,
+            correctArr: [],
+            errorArr: [],
             index: 0,
             words: [
               {
-                word: "hello",
-                hint: "您好",
+                word: "crocodile",
+                hint: "鳄鱼🐊",
               },
               {
-                word: "world",
-                hint: "世界",
+                word: "bat",
+                hint: "蝙蝠🦇",
               },
               {
-                word: "yes",
-                hint: "是的",
+                word: "lion",
+                hint: "狮子🦁",
+              },
+              {
+                word: "zebra",
+                hint: "斑马🦓",
+              },
+              {
+                word: "elephant",
+                hint: "大象🐘",
+              },
+              {
+                word: "monkey",
+                hint: "猴子🐒",
+              },
+              {
+                word: "tiger",
+                hint: "老虎🐅",
+              },
+              {
+                word: "grass",
+                hint: "草地",
+              },
+              {
+                word: "one",
+                hint: "1",
+              },
+              {
+                word: "two",
+                hint: "2",
+              },
+              {
+                word: "three",
+                hint: "3",
+              },
+              {
+                word: "four",
+                hint: "4",
+              },
+              {
+                word: "five",
+                hint: "5",
+              },
+              {
+                word: "six",
+                hint: "6",
+              },
+              {
+                word: "seven",
+                hint: "7",
+              },
+              {
+                word: "eight",
+                hint: "8",
+              },
+              {
+                word: "nine",
+                hint: "9",
+              },
+              {
+                word: "ten",
+                hint: "10",
               },
             ],
           };
@@ -187,6 +282,11 @@
           },
         },
         methods: {
+          showReport() {
+            this.show = true;
+            this.correctArr = correctArr;
+            this.errorArr = errorArr;
+          },
           redo() {
             document.querySelector("#word").innerText = "";
             const spans = document.querySelectorAll(".input-area span");
@@ -207,6 +307,14 @@
               return;
             }
             this.index++;
+
+            const word = document.querySelector("#word");
+            if (word.innerText === word.title) {
+              correctArr.push(word.title);
+            } else {
+              errorArr.push(word.title);
+            }
+
             this.redo();
           },
           playSound() {
