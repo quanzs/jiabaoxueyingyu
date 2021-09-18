@@ -7,7 +7,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1"
     />
-    <title>Document</title>
+    <title>🍁</title>
     <script src="https://cdn.staticfile.org/vue/3.0.5/vue.global.js"></script>
     <style>
       [class^="icon-"],
@@ -141,7 +141,7 @@
           查看成绩
         </button>
       </div>
-      <div class="report">
+      <div class="report" v-if="show">
         <h1>成绩单</h1>
         <div class="section">
           <span>正确: {{correctArr.length}}</span>
